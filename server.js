@@ -19,7 +19,9 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('dailyq', userSchema, 'dailyq');
-
+app.get('/', async (req, res) => {
+  res.send("olakease");
+});
 
 app.post('/dailyq', async (req, res) => {
   /// res.status(200).json(req.body);
