@@ -37,7 +37,7 @@ const Usuari = mongoose.model('Usuari', usuariSchema);
 
 // 📌 Ruta GET: Obtener todos los usuarios con sus tareas (/list)
 app.get('/list', async (req, res) => {
-  try {n
+  try {
     const usuaris = await Usuari.find({}).lean();
     if (!usuaris || usuaris.length === 0) {
       return res.status(404).json({ message: '⚠️ No hay usuarios en la base de datos.' });
