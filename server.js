@@ -37,7 +37,7 @@ const Usuari = mongoose.model('Usuari', usuariSchema);
 
 // 📌 Ruta GET: Obtener todos los usuarios con sus tareas (/list)
 app.get('/list', async (req, res) => {
-  try {
+  try {n
     const usuaris = await Usuari.find({}).lean();
     if (!usuaris || usuaris.length === 0) {
       return res.status(404).json({ message: '⚠️ No hay usuarios en la base de datos.' });
@@ -71,21 +71,25 @@ app.get('/list/:dataini/:datafi', async (req, res) => {
   try {
     const { dataini, datafi } = req.params;
 
-    // Convertir fechas a formato Date
-    const fechaInicio = new Date(dataini);
-    const fechaFin = new Date(datafi);
-    
-    // Comprobar si las fechas son válidas
+    // Convertir fechas a formato Date en UTC
+    const fechaInicio = new Date(dataini + 'T00:00:00.000Z');
+    const fechaFin = new Date(datafi + 'T23:59:59.999Z'); // Fin del día
+
+    // Validar que sean fechas correctas
     if (isNaN(fechaInicio) || isNaN(fechaFin)) {
       return res.status(400).json({ message: '⚠️ Formato de fecha inválido. Usa YYYY-MM-DD.' });
     }
 
-    // Buscar usuarios con tareas en el rango de fechas
+    // Buscar usuarios con tareas dentro del rango de fechas
     const usuaris = await Usuari.find({
-      "tasques.creation_date": { $gte: fechaInicio, $lte: fechaFin }
+      "tasques.creation_date": { 
+        $gte: fechaInicio, 
+        $lte: fechaFin 
+      }
     }).lean();
 
-    if (!usuaris || usuaris.length === 0) {
+    // Si no hay resultados
+    if (!usuaris.length) {
       return res.status(404).json({ message: '⚠️ No hay usuarios con tareas en este rango de fechas.' });
     }
 
@@ -95,6 +99,7 @@ app.get('/list/:dataini/:datafi', async (req, res) => {
     res.status(500).json({ message: 'Error filtrando usuarios por fecha', error: err.message });
   }
 });
+
 
 // Inicia el servidor
 app.listen(port, () => {
